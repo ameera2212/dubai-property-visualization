@@ -1,0 +1,642 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Dubai Property DNA</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f7fc;
+      color: #15345b;
+    }
+
+    header {
+      background: white;
+      padding: 28px 6%;
+      border-bottom: 1px solid #dce7f3;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    header p {
+      color: #64748b;
+      margin-bottom: 0;
+    }
+
+    main {
+      max-width: 1300px;
+      margin: 28px auto;
+      padding: 0 20px;
+    }
+
+    .filter-panel {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 3px 15px #15345b0d;
+    }
+
+    .filter-panel label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    select {
+      padding: 11px 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: white;
+      color: #15345b;
+      font-size: 14px;
+      min-width: 220px;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 14px;
+      padding: 25px;
+      margin-bottom: 24px;
+      box-shadow: 0 3px 15px #15345b0d;
+      overflow-x: auto;
+    }
+
+    .chart-card h2 {
+      font-size: 19px;
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .chart-card p {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .chart-row .chart-card {
+      min-width: 0;
+    }
+
+    .chart {
+      min-height: 200px;
+    }
+
+    .note {
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .chart-row {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Dubai Property DNA</h1>
+  <p>
+    What Makes a Property Valuable?
+    | Interactive Real Estate Analytics
+    | 2023–2026
+  </p>
+</header>
+
+<main>
+
+  <section class="filter-panel">
+    <label for="marketFilter">
+      Property Market
+    </label>
+
+    <select id="marketFilter">
+      <option value="All">All Properties</option>
+      <option value="Off-Plan Properties">
+        Off-Plan Properties
+      </option>
+      <option value="Existing Properties">
+        Existing Properties
+      </option>
+    </select>
+  </section>
+
+  <section class="chart-card">
+    <h2>01 — Property Value Explorer</h2>
+    <p>
+      Explore how apartment size relates to
+      transaction price. Scroll to zoom,
+      drag to pan, and hover for details.
+    </p>
+    <div id="scatter" class="chart"></div>
+  </section>
+
+  <div class="chart-row">
+
+    <section class="chart-card">
+      <h2>02 — Property DNA Heatmap</h2>
+      <p>
+        Compare median price per square meter
+        by bedroom category and market type.
+      </p>
+      <div id="heatmap" class="chart"></div>
+    </section>
+
+    <section class="chart-card">
+      <h2>03 — Smart Property Comparison</h2>
+      <p>
+        Compare bedroom categories using
+        median transaction price per m².
+      </p>
+      <div id="comparison" class="chart"></div>
+    </section>
+
+  </div>
+
+  <section class="chart-card">
+    <h2>About This Analysis</h2>
+    <p class="note">
+      This dashboard explores residential
+      apartment sales in Dubai from January
+      2023 through August 2026.
+
+      It excludes transactions outside the
+      selected size range of 20–500 m² and
+      transaction price range of AED 100,000
+      to AED 20 million.
+
+      Median prices describe observed
+      transaction patterns and do not
+      establish the causes of price differences.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  Dubai Property DNA | CS333 Interactive Visualization
+</footer>
+
+<script>
+
+const dataUrl =
+  "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv";
+
+const baseTransforms = [
+  {
+    filter:
+      "datum.trans_group_en === 'Sales' && " +
+      "datum.property_type_en === 'Unit' && " +
+      "datum.property_sub_type_en === 'Flat' && " +
+      "datum.property_usage_en === 'Residential'"
+  },
+  {
+    calculate: "toDate(datum.instance_date)",
+    as: "sale_date"
+  },
+  {
+    filter:
+      "isValid(datum.sale_date) && " +
+      "datum.sale_date >= datetime(2023,0,1) && " +
+      "datum.sale_date < datetime(2026,8,1)"
+  },
+  {
+    calculate: "toNumber(datum.procedure_area)",
+    as: "size_m2"
+  },
+  {
+    calculate: "toNumber(datum.actual_worth)",
+    as: "price_aed"
+  },
+  {
+    filter:
+      "isValid(datum.size_m2) && " +
+      "isValid(datum.price_aed) && " +
+      "datum.size_m2 >= 20 && " +
+      "datum.size_m2 <= 500 && " +
+      "datum.price_aed >= 100000 && " +
+      "datum.price_aed <= 20000000"
+  },
+  {
+    calculate: "datum.price_aed / datum.size_m2",
+    as: "price_per_m2"
+  }
+];
+
+const bedroomOrder = [
+  "Studio", "1 B/R", "2 B/R", "3 B/R", "4 B/R"
+];
+
+const baseSpec = {
+  $schema:
+    "https://vega.github.io/schema/vega-lite/v6.json",
+  background: "white",
+  data: {
+    url: dataUrl,
+    format: { type: "csv" }
+  },
+  config: {
+    view: { stroke: null },
+    axis: {
+      labelColor: "#334155",
+      titleColor: "#15345b",
+      gridColor: "#e8eef5"
+    }
+  }
+};
+
+function marketTransform(market) {
+  return market === "All"
+    ? []
+    : [{
+        filter: {
+          field: "reg_type_en",
+          equal: market
+        }
+      }];
+}
+
+let selectedBedroom = null;
+
+function buildScatter(market) {
+  return {
+    ...baseSpec,
+    width: 850,
+    height: 370,
+    transform: [
+      ...baseTransforms,
+      ...marketTransform(market)
+    ],
+    params: [{
+      name: "propertyZoom",
+      select: {
+        type: "interval",
+        encodings: ["x", "y"],
+        bind: "scales",
+        translate:
+          "[mousedown, window:mouseup] > window:mousemove!",
+        zoom: "wheel!"
+      }
+    }],
+    mark: {
+      type: "circle",
+      size: 24,
+      stroke: "white",
+      strokeWidth: 0.3
+    },
+    encoding: {
+      x: {
+        field: "size_m2",
+        type: "quantitative",
+        title: "Property Size (m²)"
+      },
+      y: {
+        field: "price_aed",
+        type: "quantitative",
+        title: "Transaction Price (AED)",
+        axis: { format: "~s" }
+      },
+      color: {
+        field: "reg_type_en",
+        type: "nominal",
+        title: "Registration Type",
+        scale: {
+          domain: [
+            "Existing Properties",
+            "Off-Plan Properties"
+          ],
+          range: ["#3779b7", "#f1a15b"]
+        }
+      },
+      opacity: {
+        condition: {
+          test:
+            selectedBedroom === null
+              ? "true"
+              : "datum.rooms_en === " +
+                JSON.stringify(selectedBedroom),
+          value: 0.65
+        },
+        value: 0.06
+      },
+      tooltip: [
+        { field: "area_name_en", title: "Community" },
+        { field: "rooms_en", title: "Bedrooms" },
+        {
+          field: "size_m2",
+          title: "Size (m²)",
+          format: ",.1f"
+        },
+        {
+          field: "price_aed",
+          title: "Price (AED)",
+          format: ",.0f"
+        },
+        {
+          field: "price_per_m2",
+          title: "AED/m²",
+          format: ",.0f"
+        },
+        {
+          field: "reg_type_en",
+          title: "Registration"
+        }
+      ]
+    }
+  };
+}
+
+function aggregateTransforms(market, groupby) {
+  return [
+    ...baseTransforms,
+    ...marketTransform(market),
+    {
+      filter:
+        "isValid(datum.rooms_en) && " +
+        "datum.rooms_en !== ''"
+    },
+    {
+      aggregate: [
+        {
+          op: "median",
+          field: "price_per_m2",
+          as: "median_price_m2"
+        },
+        {
+          op: "count",
+          as: "transaction_count"
+        }
+      ],
+      groupby
+    },
+    {
+      filter: "datum.transaction_count >= 10"
+    }
+  ];
+}
+
+function buildHeatmap(market) {
+  return {
+    ...baseSpec,
+    width: 360,
+    height: 230,
+    transform: aggregateTransforms(
+      market,
+      ["rooms_en", "reg_type_en"]
+    ),
+    params: [{
+      name: "bedroomClick",
+      select: {
+        type: "point",
+        fields: ["rooms_en"],
+        on: "click",
+        clear: "dblclick"
+      }
+    }],
+    mark: {
+      type: "rect",
+      stroke: "white",
+      strokeWidth: 2
+    },
+    encoding: {
+      x: {
+        field: "rooms_en",
+        type: "nominal",
+        title: "Bedroom Category",
+        sort: bedroomOrder
+      },
+      y: {
+        field: "reg_type_en",
+        type: "nominal",
+        title: "Registration Type"
+      },
+      color: {
+        field: "median_price_m2",
+        type: "quantitative",
+        title: "Median AED/m²",
+        scale: { scheme: "blues" }
+      },
+      tooltip: [
+        { field: "rooms_en", title: "Bedrooms" },
+        {
+          field: "reg_type_en",
+          title: "Registration"
+        },
+        {
+          field: "median_price_m2",
+          title: "Median AED/m²",
+          format: ",.0f"
+        },
+        {
+          field: "transaction_count",
+          title: "Transactions",
+          format: ","
+        }
+      ]
+    }
+  };
+}
+
+function buildComparison(market) {
+  return {
+    ...baseSpec,
+    width: 350,
+    height: 230,
+    transform: aggregateTransforms(
+      market,
+      ["rooms_en"]
+    ),
+    encoding: {
+      y: {
+        field: "rooms_en",
+        type: "nominal",
+        title: null,
+        sort: bedroomOrder
+      },
+      x: {
+        field: "median_price_m2",
+        type: "quantitative",
+        title: "Median AED/m²",
+        scale: { zero: true }
+      }
+    },
+    layer: [
+      {
+        mark: {
+          type: "bar",
+          cornerRadiusEnd: 4
+        },
+        encoding: {
+          color: {
+            condition: {
+              test:
+                selectedBedroom === null
+                  ? "false"
+                  : "datum.rooms_en === " +
+                    JSON.stringify(selectedBedroom),
+              value: "#1d4ed8"
+            },
+            value: "#9bc4e8"
+          },
+          tooltip: [
+            {
+              field: "rooms_en",
+              title: "Bedrooms"
+            },
+            {
+              field: "median_price_m2",
+              title: "Median AED/m²",
+              format: ",.0f"
+            },
+            {
+              field: "transaction_count",
+              title: "Transactions"
+            }
+          ]
+        }
+      },
+      {
+        mark: {
+          type: "text",
+          align: "left",
+          dx: 5,
+          fontSize: 11,
+          color: "#15345b"
+        },
+        encoding: {
+          text: {
+            field: "median_price_m2",
+            type: "quantitative",
+            format: ",.0f"
+          }
+        }
+      }
+    ]
+  };
+}
+
+async function renderDashboard() {
+  const market =
+    document.getElementById("marketFilter").value;
+
+  const options = {
+    actions: false,
+    renderer: "canvas"
+  };
+
+  const scatterResult = await vegaEmbed(
+    "#scatter",
+    buildScatter(market),
+    options
+  );
+
+  const heatmapResult = await vegaEmbed(
+    "#heatmap",
+    buildHeatmap(market),
+    options
+  );
+
+  await vegaEmbed(
+    "#comparison",
+    buildComparison(market),
+    options
+  );
+
+  heatmapResult.view.addEventListener(
+    "click",
+    async (event, item) => {
+      if (!item || !item.datum) return;
+
+      const bedroom = item.datum.rooms_en;
+
+      if (!bedroom) return;
+
+      selectedBedroom = bedroom;
+
+      await vegaEmbed(
+        "#scatter",
+        buildScatter(market),
+        options
+      );
+
+      await vegaEmbed(
+        "#comparison",
+        buildComparison(market),
+        options
+      );
+    }
+  );
+
+  heatmapResult.view.addEventListener(
+    "dblclick",
+    async () => {
+      selectedBedroom = null;
+
+      await vegaEmbed(
+        "#scatter",
+        buildScatter(market),
+        options
+      );
+
+      await vegaEmbed(
+        "#comparison",
+        buildComparison(market),
+        options
+      );
+    }
+  );
+}
+
+document.getElementById("marketFilter")
+  .addEventListener("change", () => {
+    selectedBedroom = null;
+    renderDashboard();
+  });
+
+renderDashboard().catch(error => {
+  console.error(error);
+  alert("Dashboard error: " + error.message);
+});
+
+</script>
+
+</body>
+</html>
