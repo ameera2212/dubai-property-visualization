@@ -3,277 +3,188 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dubai Property DNA | Analytics Dashboard</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dubai Property DNA | Analytics</title>
 <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
-
 <style>
 :root {
-  --navy: #17365d;
-  --blue: #367ab8;
-  --orange: #f1a15b;
-  --background: #f4f6f9;
-  --border: #dce3eb;
-  --muted: #64748b;
+  --navy:#17365d;
+  --blue:#367ab8;
+  --orange:#f1a15b;
+  --bg:#f3f6fa;
+  --border:#dce4ee;
+  --muted:#64748b;
 }
-
-* { box-sizing: border-box; }
-
+* {box-sizing:border-box}
 body {
-  margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: var(--background);
-  color: #24364b;
+  margin:0;
+  font-family:"Segoe UI",Arial,sans-serif;
+  background:var(--bg);
+  color:#24364b;
 }
-
-.topbar {
-  height: 58px;
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 25px;
+header {
+  background:white;
+  border-bottom:1px solid var(--border);
+  padding:17px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
 }
-
-.brand {
-  font-size: 20px;
-  font-weight: 750;
-  color: var(--navy);
-}
-
-.top-label {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-main {
-  max-width: 1550px;
-  margin: auto;
-  padding: 18px;
-}
-
+.brand {font-size:22px;font-weight:750;color:var(--navy)}
+.top-label {font-size:12px;color:var(--muted)}
+main {max-width:1700px;margin:auto;padding:16px}
 .page-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+  margin-bottom:16px;
 }
-
-.page-title h1 {
-  font-size: 23px;
-  margin: 0;
-  color: var(--navy);
+h1 {font-size:23px;margin:0;color:var(--navy)}
+.page-title p {font-size:13px;color:var(--muted);margin:5px 0}
+.filters {display:flex;gap:9px;flex-wrap:wrap}
+select,input,button {
+  border:1px solid #c8d5e5;
+  background:white;
+  color:var(--navy);
+  border-radius:6px;
+  padding:9px 12px;
+  font-size:13px;
 }
-
-.page-title p {
-  color: var(--muted);
-  font-size: 13px;
-  margin: 5px 0 0;
-}
-
-.filters {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-select, input {
-  padding: 9px 12px;
-  background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 13px;
-  color: var(--navy);
-}
-
-button {
-  border: 1px solid #b9cbe0;
-  background: white;
-  padding: 9px 13px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--navy);
-}
-
-button:hover { background: #eaf2fb; }
-
+button {cursor:pointer}
+button:hover {background:#eaf2fb}
 .kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0,1fr));
-  gap: 12px;
-  margin-bottom: 12px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:12px;
 }
-
-.kpi {
-  background: white;
-  border: 1px solid var(--border);
-  padding: 17px 20px;
-  min-width: 0;
+.kpi,.panel,.insight-card {
+  background:white;
+  border:1px solid var(--border);
+  min-width:0;
 }
-
-.kpi-label {
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 9px;
-}
-
+.kpi {padding:18px 20px}
+.kpi-label {color:var(--muted);font-size:12px}
 .kpi-value {
-  font-size: clamp(20px, 2.1vw, 31px);
-  font-weight: 650;
-  color: var(--blue);
+  color:var(--blue);
+  font-size:clamp(20px,2.2vw,33px);
+  font-weight:700;
+  margin:12px 0 5px;
 }
-
-.kpi-sub {
-  font-size: 11px;
-  color: #94a3b8;
-  margin-top: 6px;
-}
-
+.kpi-sub {color:#94a3b8;font-size:11px}
 .dashboard {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 12px;
-  margin-bottom: 12px;
+  display:grid;
+  grid-template-columns:0.9fr 1.35fr;
+  gap:12px;
+  margin-bottom:12px;
 }
-
-.panel {
-  background: white;
-  border: 1px solid var(--border);
-  padding: 15px;
-  min-width: 0;
-  overflow: auto;
-}
-
-.panel h2 {
-  font-size: 14px;
-  color: var(--navy);
-  margin: 0 0 5px;
-}
-
-.panel p {
-  font-size: 11px;
-  color: var(--muted);
-  margin: 0 0 12px;
-  line-height: 1.5;
-}
-
-.chart {
-  min-height: 190px;
-}
-
 .lower {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:12px;
+  margin-bottom:12px;
 }
-
-.table-panel {
-  background: white;
-  border: 1px solid var(--border);
-  padding: 15px;
+.panel {padding:16px;overflow:auto}
+.panel h2,.insight-card h2 {
+  color:var(--navy);
+  font-size:15px;
+  margin:0 0 6px;
 }
-
+.panel p {
+  color:var(--muted);
+  font-size:12px;
+  margin:0 0 13px;
+}
+.chart {min-height:200px}
+.zoom-controls {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:12px;
+  background:#f5f9fe;
+  border:1px solid #e2eaf4;
+  padding:10px;
+  margin-bottom:12px;
+  border-radius:6px;
+}
+.zoom-controls label {font-size:11px;color:var(--navy)}
+.zoom-controls input {width:125px;vertical-align:middle}
+.zoom-controls strong {font-size:11px}
+.insights {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:12px;
+}
+.insight-card {padding:17px 20px}
+.insight-card p {
+  font-size:13px;
+  color:#50647c;
+  line-height:1.65;
+  margin:9px 0 0;
+}
 .table-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-bottom:12px;
 }
-
-.table-head h2 {
-  margin: 0;
-  color: var(--navy);
-  font-size: 15px;
-}
-
-.table-wrap {
-  max-height: 270px;
-  overflow: auto;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 12px;
-}
-
+.table-wrap {max-height:260px;overflow:auto}
+table {width:100%;border-collapse:collapse;font-size:12px}
 th {
-  position: sticky;
-  top: 0;
-  background: #eaf0f7;
-  color: var(--navy);
-  text-align: left;
-  padding: 11px;
-  white-space: nowrap;
+  position:sticky;
+  top:0;
+  background:#eaf0f7;
+  color:var(--navy);
+  text-align:left;
+  padding:11px;
+  white-space:nowrap;
 }
-
 td {
-  border-bottom: 1px solid #edf1f5;
-  padding: 10px 11px;
-  white-space: nowrap;
+  border-bottom:1px solid #edf1f5;
+  padding:10px 11px;
+  white-space:nowrap;
 }
-
-tr:hover td { background: #f5f9ff; }
-
-.status {
-  padding: 30px;
-  text-align: center;
-  color: var(--muted);
+tr:hover td {background:#f5f9ff}
+.small {font-size:11px;color:var(--muted);line-height:1.6}
+footer {font-size:11px;color:var(--muted);padding:14px 0}
+@media(max-width:1000px) {
+  .dashboard,.lower,.insights {grid-template-columns:1fr}
 }
-
-.footer {
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.6;
-  padding: 10px 0 25px;
-}
-
-@media(max-width: 950px) {
-  .kpis { grid-template-columns: repeat(2,1fr); }
-  .dashboard, .lower { grid-template-columns: 1fr; }
-}
-
-@media(max-width: 550px) {
-  .kpis { grid-template-columns: 1fr 1fr; }
-  .topbar { padding: 0 12px; }
-  main { padding: 10px; }
-  .panel { padding: 10px; }
+@media(max-width:650px) {
+  .kpis {grid-template-columns:repeat(2,1fr)}
+  header {padding:13px}
+  main {padding:10px}
+  .panel {padding:11px}
 }
 </style>
 </head>
-
 <body>
 
-<header class="topbar">
+<header>
   <div class="brand">Dubai Property DNA</div>
   <div class="top-label">PROPERTY VALUES | ANALYSIS</div>
 </header>
 
 <main>
-
 <div class="page-title">
   <div>
     <h1>Dubai Residential Property Analytics</h1>
     <p>Interactive apartment sales analysis | 2023–2026</p>
   </div>
-
   <div class="filters">
     <select id="marketFilter">
       <option value="All">All Markets</option>
       <option value="Off-Plan Properties">Off-Plan</option>
       <option value="Existing Properties">Existing</option>
     </select>
-
     <select id="bedroomFilter">
       <option value="All">All Bedrooms</option>
       <option value="Studio">Studio</option>
@@ -282,8 +193,10 @@ tr:hover td { background: #f5f9ff; }
       <option value="3 B/R">3 Bedrooms</option>
       <option value="4 B/R">4 Bedrooms</option>
     </select>
-
-    <button id="resetBtn">Reset Filters</button>
+    <select id="communityFilter">
+      <option value="All">All Communities</option>
+    </select>
+    <button id="resetFilters">Reset Filters</button>
   </div>
 </div>
 
@@ -293,19 +206,16 @@ tr:hover td { background: #f5f9ff; }
     <div class="kpi-value" id="kpiCount">—</div>
     <div class="kpi-sub">Filtered transactions</div>
   </div>
-
   <div class="kpi">
     <div class="kpi-label">Median Transaction Value</div>
     <div class="kpi-value" id="kpiPrice">—</div>
     <div class="kpi-sub">AED per transaction</div>
   </div>
-
   <div class="kpi">
     <div class="kpi-label">Median Price per m²</div>
     <div class="kpi-value" id="kpiMeter">—</div>
     <div class="kpi-sub">AED / m²</div>
   </div>
-
   <div class="kpi">
     <div class="kpi-label">Communities Represented</div>
     <div class="kpi-value" id="kpiAreas">—</div>
@@ -316,37 +226,65 @@ tr:hover td { background: #f5f9ff; }
 <section class="dashboard">
   <div class="panel">
     <h2>01 — Sales Distribution</h2>
-    <p>Share of transactions by registration type</p>
+    <p>Existing versus off-plan apartment sales</p>
     <div id="donut" class="chart"></div>
   </div>
-
   <div class="panel">
     <h2>02 — Property Value by Bedroom Category</h2>
-    <p>Median AED/m² and transaction counts</p>
+    <p>Median AED/m² · Click a bar to select a bedroom</p>
     <div id="bars" class="chart"></div>
   </div>
 </section>
 
 <section class="lower">
   <div class="panel">
-    <h2>03 — Property Value Explorer</h2>
-    <p>Apartment size vs transaction value · Scroll to zoom · Drag to pan</p>
+    <h2>03 — Interactive Property Value Explorer</h2>
+    <p>Apartment size versus transaction value</p>
+    <div class="zoom-controls">
+      <label>
+        Maximum size:
+        <input type="range" id="sizeZoom"
+          min="60" max="500" step="10" value="500">
+        <strong id="sizeLabel">500 m²</strong>
+      </label>
+      <label>
+        Maximum price:
+        <input type="range" id="priceZoom"
+          min="1" max="20" step="1" value="20">
+        <strong id="priceLabel">20M AED</strong>
+      </label>
+      <button id="resetZoom">Reset Zoom</button>
+    </div>
     <div id="scatter" class="chart"></div>
+    <p class="small">
+      Use the sliders to zoom into lower size and price ranges.
+      Hover over points for transaction details.
+      Sliders change the visible axes, not the dataset.
+    </p>
   </div>
-
   <div class="panel">
     <h2>04 — Property DNA Heatmap</h2>
-    <p>Click a cell to select a bedroom category · Double-click to clear</p>
+    <p>Click a cell to select a bedroom · Double-click to clear</p>
     <div id="heatmap" class="chart"></div>
   </div>
 </section>
 
-<section class="table-panel">
+<section class="insights">
+  <div class="insight-card">
+    <h2>05 — Automatic Market Insights</h2>
+    <p id="marketInsight">Loading market insights...</p>
+  </div>
+  <div class="insight-card">
+    <h2>06 — Data Quality & Methodology</h2>
+    <p id="qualityInsight">Checking dataset...</p>
+  </div>
+</section>
+
+<section class="panel">
   <div class="table-head">
-    <h2>05 — Transaction Details</h2>
+    <h2>07 — Transaction Details</h2>
     <input id="searchBox" placeholder="Search community...">
   </div>
-
   <div class="table-wrap">
     <table>
       <thead>
@@ -362,512 +300,582 @@ tr:hover td { background: #f5f9ff; }
       <tbody id="detailsBody"></tbody>
     </table>
   </div>
-  <p id="tableNote" style="font-size:11px;color:#64748b"></p>
+  <p class="small" id="tableNote"></p>
 </section>
 
-<div class="footer">
-  Data: Course transactions.csv. Residential flat sales from
-  January 2023 through August 2026, with transaction sizes
-  between 20 and 500 m² and values between AED 100,000
-  and AED 20 million. Median values describe transactions,
-  not the causes of price differences. Heatmap groups require
-  at least 10 transactions.
-</div>
-
+<footer>
+  Dubai Property DNA | CS333 Interactive Visualization |
+  Source: Course transactions.csv |
+  Descriptive analysis, not causal inference.
+</footer>
 </main>
 
 <script>
 const CSV_URL =
  "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv";
 
-const order = ["Studio","1 B/R","2 B/R","3 B/R","4 B/R"];
+const bedroomOrder =
+ ["Studio","1 B/R","2 B/R","3 B/R","4 B/R"];
 
-const colors = {
-  "Existing Properties": "#367ab8",
-  "Off-Plan Properties": "#f1a15b"
+const marketColors = {
+ "Existing Properties":"#367ab8",
+ "Off-Plan Properties":"#f1a15b"
 };
 
 let allRows = [];
 let filteredRows = [];
 let selectedBedroom = null;
-let scatterView = null;
+let excludedCount = 0;
+let rawCount = 0;
+let dashboardVersion = 0;
 let heatmapView = null;
-let renderVersion = 0;
 
+const el = id => document.getElementById(id);
 const fmt = n => Math.round(n).toLocaleString("en-US");
 
 function median(values) {
-  const a = values.filter(Number.isFinite).sort((x,y)=>x-y);
-  if (!a.length) return 0;
-  const m = Math.floor(a.length/2);
-  return a.length%2 ? a[m] : (a[m-1]+a[m])/2;
+ const a = values.filter(Number.isFinite).sort((x,y)=>x-y);
+ if (!a.length) return NaN;
+ const m = Math.floor(a.length/2);
+ return a.length%2 ? a[m] : (a[m-1]+a[m])/2;
 }
 
 function money(n) {
-  if (n >= 1000000) return "AED " + (n/1000000).toFixed(2) + "M";
-  if (n >= 1000) return "AED " + (n/1000).toFixed(1) + "K";
-  return "AED " + fmt(n);
+ if (!Number.isFinite(n)) return "—";
+ if (n>=1000000) return "AED "+(n/1000000).toFixed(2)+"M";
+ if (n>=1000) return "AED "+(n/1000).toFixed(1)+"K";
+ return "AED "+fmt(n);
 }
 
-function validRow(d) {
-  const date = new Date(d.instance_date);
-  const size = Number(d.procedure_area);
-  const price = Number(d.actual_worth);
+function parseDate(value) {
+ const s = String(value||"").trim();
+ if (!s) return NaN;
 
-  if (
-    d.trans_group_en !== "Sales" ||
-    d.property_type_en !== "Unit" ||
-    d.property_sub_type_en !== "Flat" ||
-    d.property_usage_en !== "Residential"
-  ) return null;
+ // Supports ISO and day/month/year date formats.
+ let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+ if (m) return Date.UTC(+m[1],+m[2]-1,+m[3]);
 
-  if (
-    !Number.isFinite(date.getTime()) ||
-    date < new Date(2023,0,1) ||
-    date >= new Date(2026,8,1)
-  ) return null;
+ m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+ if (m) return Date.UTC(+m[3],+m[2]-1,+m[1]);
 
-  if (
-    !Number.isFinite(size) ||
-    !Number.isFinite(price) ||
-    size < 20 || size > 500 ||
-    price < 100000 || price > 20000000
-  ) return null;
+ const t = Date.parse(s);
+ return Number.isFinite(t) ? t : NaN;
+}
 
-  return {
-    community: d.area_name_en || "Unknown",
-    rooms: d.rooms_en || "Unknown",
-    market: d.reg_type_en || "Unknown",
-    size,
-    price,
-    ppm: price/size
-  };
+function prepareRow(d) {
+ if (
+  d.trans_group_en!=="Sales" ||
+  d.property_type_en!=="Unit" ||
+  d.property_sub_type_en!=="Flat" ||
+  d.property_usage_en!=="Residential"
+ ) return null;
+
+ const date = parseDate(d.instance_date);
+ const size = Number(d.procedure_area);
+ const price = Number(d.actual_worth);
+
+ if (
+  !Number.isFinite(date) ||
+  date<Date.UTC(2023,0,1) ||
+  date>=Date.UTC(2026,8,1) ||
+  !Number.isFinite(size) ||
+  !Number.isFinite(price) ||
+  size<20 || size>500 ||
+  price<100000 || price>20000000
+ ) return null;
+
+ return {
+  community:d.area_name_en||"Unknown",
+  rooms:d.rooms_en||"Unknown",
+  market:d.reg_type_en||"Unknown",
+  size,price,
+  ppm:price/size
+ };
 }
 
 function getRows() {
-  const market = document.getElementById("marketFilter").value;
-  const bedroom = document.getElementById("bedroomFilter").value;
+ const market=el("marketFilter").value;
+ const bedroom=el("bedroomFilter").value;
+ const community=el("communityFilter").value;
 
-  return allRows.filter(d =>
-    (market === "All" || d.market === market) &&
-    (bedroom === "All" || d.rooms === bedroom)
-  );
+ return allRows.filter(d=>
+  (market==="All"||d.market===market) &&
+  (bedroom==="All"||d.rooms===bedroom) &&
+  (community==="All"||d.community===community)
+ );
 }
 
-function updateKPIs(rows) {
-  document.getElementById("kpiCount").textContent = fmt(rows.length);
+function selectedRows() {
+ return filteredRows.filter(d=>
+  selectedBedroom===null || d.rooms===selectedBedroom
+ );
+}
 
-  document.getElementById("kpiPrice").textContent =
-    rows.length ? money(median(rows.map(d=>d.price))) : "—";
+function updateKPIs() {
+ const rows=selectedRows();
+ el("kpiCount").textContent=fmt(rows.length);
+ el("kpiPrice").textContent=money(median(rows.map(d=>d.price)));
 
-  document.getElementById("kpiMeter").textContent =
-    rows.length ? "AED " + fmt(median(rows.map(d=>d.ppm))) : "—";
+ const ppm=median(rows.map(d=>d.ppm));
+ el("kpiMeter").textContent=
+  Number.isFinite(ppm)?"AED "+fmt(ppm):"—";
 
-  document.getElementById("kpiAreas").textContent =
-    fmt(new Set(rows.filter(d=>d.community!=="Unknown")
-      .map(d=>d.community)).size);
+ el("kpiAreas").textContent=fmt(
+  new Set(rows.filter(d=>d.community!=="Unknown")
+   .map(d=>d.community)).size
+ );
 }
 
 function chartBase(values) {
-  return {
-    $schema: "https://vega.github.io/schema/vega-lite/v6.json",
-    background: "white",
-    data: {values},
-    config: {
-      view: {stroke: null},
-      axis: {
-        labelColor: "#475569",
-        titleColor: "#17365d",
-        gridColor: "#e8edf3",
-        labelFontSize: 10,
-        titleFontSize: 11
-      },
-      legend: {
-        labelFontSize: 10,
-        titleFontSize: 11
-      }
-    }
-  };
+ return {
+  $schema:"https://vega.github.io/schema/vega-lite/v6.json",
+  background:"white",
+  data:{values},
+  config:{
+   view:{stroke:null},
+   axis:{
+    labelColor:"#475569",
+    titleColor:"#17365d",
+    gridColor:"#e8edf3",
+    labelFontSize:10,
+    titleFontSize:11
+   },
+   legend:{labelFontSize:10,titleFontSize:11}
+  }
+ };
 }
 
-function grouped(rows, keys) {
-  const groups = new Map();
+function grouped(rows,keys) {
+ const groups=new Map();
 
-  for (const d of rows) {
-    if (!order.includes(d.rooms)) continue;
+ for(const d of rows) {
+  if(!bedroomOrder.includes(d.rooms)) continue;
+  const key=keys.map(k=>d[k]).join("||");
+  if(!groups.has(key)) groups.set(key,{sample:d,prices:[]});
+  groups.get(key).prices.push(d.ppm);
+ }
 
-    const key = keys.map(k=>d[k]).join("||");
+ return [...groups.values()].map(g=>({
+  rooms:g.sample.rooms,
+  market:g.sample.market,
+  ppm:median(g.prices),
+  count:g.prices.length
+ })).filter(d=>d.count>=10);
+}
 
-    if (!groups.has(key)) {
-      groups.set(key, {items:[], sample:d});
-    }
-
-    groups.get(key).items.push(d.ppm);
-  }
-
-  return [...groups.values()].map(g=>({
-    rooms: g.sample.rooms,
-    market: g.sample.market,
-    ppm: median(g.items),
-    count: g.items.length
-  })).filter(d=>d.count>=10);
+function chartWidth(id,maxWidth,minWidth=250) {
+ const container=el(id);
+ const parent=container.parentElement;
+ return Math.max(minWidth,
+  Math.min(maxWidth,parent.clientWidth-90)
+ );
 }
 
 async function drawDonut(rows) {
-  const values = Object.keys(colors).map(market=>({
-    market,
-    count: rows.filter(d=>d.market===market).length
-  })).filter(d=>d.count>0);
+ const values=Object.keys(marketColors).map(market=>({
+  market,
+  count:rows.filter(d=>d.market===market).length
+ })).filter(d=>d.count>0);
 
-  const spec = {
-    ...chartBase(values),
-    width: 260,
-    height: 220,
-    mark: {
-      type: "arc",
-      innerRadius: 65,
-      outerRadius: 98
-    },
-    encoding: {
-      theta: {
-        field: "count",
-        type: "quantitative"
-      },
-      color: {
-        field: "market",
-        type: "nominal",
-        title: null,
-        scale: {
-          domain: Object.keys(colors),
-          range: Object.values(colors)
-        }
-      },
-      tooltip: [
-        {field:"market",title:"Registration"},
-        {field:"count",title:"Transactions",format:","}
-      ]
+ const spec={
+  ...chartBase(values),
+  width:240,
+  height:205,
+  mark:{type:"arc",innerRadius:62,outerRadius:95},
+  encoding:{
+   theta:{field:"count",type:"quantitative"},
+   color:{
+    field:"market",type:"nominal",title:null,
+    scale:{
+     domain:Object.keys(marketColors),
+     range:Object.values(marketColors)
     }
-  };
-
-  await vegaEmbed("#donut",spec,{actions:false});
+   },
+   tooltip:[
+    {field:"market",title:"Registration"},
+    {field:"count",title:"Transactions",format:","}
+   ]
+  }
+ };
+ await vegaEmbed("#donut",spec,{actions:false});
 }
 
 async function drawBars(rows) {
-  const values = grouped(rows,["rooms"]);
-
-  const spec = {
-    ...chartBase(values),
-    width: 490,
-    height: 225,
-    encoding: {
-      x: {
-        field: "rooms",
-        type: "nominal",
-        sort: order,
-        title: "Bedroom category",
-        axis: {labelAngle:0}
+ const values=grouped(rows,["rooms"]);
+ const spec={
+  ...chartBase(values),
+  width:chartWidth("bars",580),
+  height:215,
+  encoding:{
+   x:{
+    field:"rooms",type:"nominal",
+    sort:bedroomOrder,title:"Bedroom category",
+    axis:{labelAngle:0}
+   },
+   y:{
+    field:"ppm",type:"quantitative",
+    title:"Median AED/m²"
+   }
+  },
+  layer:[
+   {
+    mark:{type:"bar",cornerRadiusEnd:3},
+    encoding:{
+     color:{
+      condition:{
+       test:selectedBedroom
+        ? "datum.rooms === "+JSON.stringify(selectedBedroom)
+        : "false",
+       value:"#1d4ed8"
       },
-      y: {
-        field: "ppm",
-        type: "quantitative",
-        title: "Median AED/m²"
-      }
+      value:"#73add9"
+     },
+     tooltip:[
+      {field:"rooms",title:"Bedrooms"},
+      {field:"ppm",title:"Median AED/m²",format:",.0f"},
+      {field:"count",title:"Transactions",format:","}
+     ]
+    }
+   },
+   {
+    mark:{
+     type:"text",dy:-8,
+     fontSize:10,color:"#17365d"
     },
-    layer: [
-      {
-        mark: {
-          type:"bar",
-          cornerRadiusTopLeft:3,
-          cornerRadiusTopRight:3
-        },
-        encoding: {
-          color: {
-            condition: {
-              test: selectedBedroom
-                ? "datum.rooms === " + JSON.stringify(selectedBedroom)
-                : "false",
-              value: "#1d4ed8"
-            },
-            value:"#73add9"
-          },
-          tooltip: [
-            {field:"rooms",title:"Bedrooms"},
-            {field:"ppm",title:"Median AED/m²",format:",.0f"},
-            {field:"count",title:"Transactions",format:","}
-          ]
-        }
-      },
-      {
-        mark: {
-          type:"text",
-          dy:-8,
-          fontSize:10,
-          color:"#17365d"
-        },
-        encoding: {
-          text: {
-            field:"ppm",
-            type:"quantitative",
-            format:",.0f"
-          }
-        }
-      }
-    ]
-  };
-
-  await vegaEmbed("#bars",spec,{actions:false});
+    encoding:{
+     text:{field:"ppm",type:"quantitative",format:",.0f"}
+    }
+   }
+  ]
+ };
+ const result=await vegaEmbed("#bars",spec,{actions:false});
+ result.view.addEventListener("click",async(event,item)=>{
+  if(!item?.datum?.rooms) return;
+  await chooseBedroom(item.datum.rooms);
+ });
 }
 
 async function drawScatter(rows) {
-  const values = rows.map(d=>({
-    ...d,
-    selected: selectedBedroom===null ||
-      d.rooms===selectedBedroom
-  }));
+ const maxSize=Number(el("sizeZoom").value);
+ const maxPrice=Number(el("priceZoom").value)*1000000;
 
-  const spec = {
-    ...chartBase(values),
-    width: 510,
-    height: 290,
-    params: [{
-      name:"zoomScatter",
-      select:{
-        type:"interval",
-        encodings:["x","y"],
-        bind:"scales",
-        translate:"[mousedown, window:mouseup] > window:mousemove!",
-        zoom:"wheel!"
-      }
-    }],
-    mark:{
-      type:"circle",
-      size:20,
-      stroke:"white",
-      strokeWidth:0.25
-    },
-    encoding:{
-      x:{
-        field:"size",
-        type:"quantitative",
-        title:"Apartment size (m²)"
-      },
-      y:{
-        field:"price",
-        type:"quantitative",
-        title:"Transaction value (AED)",
-        axis:{format:"~s"}
-      },
-      color:{
-        field:"market",
-        type:"nominal",
-        title:"Registration",
-        scale:{
-          domain:Object.keys(colors),
-          range:Object.values(colors)
-        }
-      },
-      opacity:{
-        condition:{
-          test:"datum.selected",
-          value:0.6
-        },
-        value:0.06
-      },
-      tooltip:[
-        {field:"community",title:"Community"},
-        {field:"rooms",title:"Bedrooms"},
-        {field:"market",title:"Registration"},
-        {field:"size",title:"Size (m²)",format:",.1f"},
-        {field:"price",title:"Price (AED)",format:",.0f"},
-        {field:"ppm",title:"AED/m²",format:",.0f"}
-      ]
+ el("sizeLabel").textContent=maxSize+" m²";
+ el("priceLabel").textContent=
+  el("priceZoom").value+"M AED";
+
+ const values=rows.map(d=>({
+  ...d,
+  highlighted:selectedBedroom===null ||
+   d.rooms===selectedBedroom
+ }));
+
+ const spec={
+  ...chartBase(values),
+  width:chartWidth("scatter",600),
+  height:300,
+  mark:{
+   type:"circle",
+   size:20,
+   stroke:"white",
+   strokeWidth:0.25,
+   clip:true
+  },
+  encoding:{
+   x:{
+    field:"size",type:"quantitative",
+    title:"Apartment size (m²)",
+    scale:{domain:[20,maxSize],nice:false}
+   },
+   y:{
+    field:"price",type:"quantitative",
+    title:"Transaction value (AED)",
+    scale:{domain:[0,maxPrice],nice:false},
+    axis:{format:"~s"}
+   },
+   color:{
+    field:"market",type:"nominal",
+    title:"Registration",
+    scale:{
+     domain:Object.keys(marketColors),
+     range:Object.values(marketColors)
     }
-  };
-
-  const result = await vegaEmbed(
-    "#scatter",spec,{actions:false,renderer:"canvas"}
-  );
-  scatterView = result.view;
+   },
+   opacity:{
+    condition:{
+     test:"datum.highlighted",
+     value:0.6
+    },
+    value:0.05
+   },
+   tooltip:[
+    {field:"community",title:"Community"},
+    {field:"rooms",title:"Bedrooms"},
+    {field:"market",title:"Registration"},
+    {field:"size",title:"Size (m²)",format:",.1f"},
+    {field:"price",title:"Value (AED)",format:",.0f"},
+    {field:"ppm",title:"AED/m²",format:",.0f"}
+   ]
+  }
+ };
+ await vegaEmbed("#scatter",spec,{
+  actions:false,renderer:"canvas"
+ });
 }
 
 async function drawHeatmap(rows) {
-  const values = grouped(rows,["rooms","market"]);
+ const values=grouped(rows,["rooms","market"]);
+ const spec={
+  ...chartBase(values),
+  width:chartWidth("heatmap",420),
+  height:245,
+  params:[{
+   name:"bedroomSelection",
+   select:{
+    type:"point",
+    fields:["rooms"],
+    on:"click",
+    clear:"dblclick"
+   }
+  }],
+  mark:{type:"rect"},
+  encoding:{
+   x:{
+    field:"rooms",type:"nominal",
+    sort:bedroomOrder,
+    title:"Bedroom category",
+    axis:{labelAngle:0}
+   },
+   y:{
+    field:"market",type:"nominal",
+    title:null
+   },
+   color:{
+    field:"ppm",type:"quantitative",
+    title:"Median AED/m²",
+    scale:{scheme:"blues"}
+   },
+   stroke:{
+    condition:{
+     param:"bedroomSelection",
+     value:"#172554"
+    },
+    value:"white"
+   },
+   strokeWidth:{
+    condition:{
+     param:"bedroomSelection",
+     value:3
+    },
+    value:1.5
+   },
+   tooltip:[
+    {field:"rooms",title:"Bedrooms"},
+    {field:"market",title:"Registration"},
+    {field:"ppm",title:"Median AED/m²",format:",.0f"},
+    {field:"count",title:"Transactions",format:","}
+   ]
+  }
+ };
 
-  const spec = {
-    ...chartBase(values),
-    width: 390,
-    height: 245,
-    params:[{
-      name:"bedroomSelection",
-      select:{
-        type:"point",
-        fields:["rooms"],
-        on:"click",
-        clear:"dblclick"
-      }
-    }],
-    mark:{type:"rect"},
-    encoding:{
-      x:{
-        field:"rooms",
-        type:"nominal",
-        sort:order,
-        title:"Bedroom category",
-        axis:{labelAngle:0}
-      },
-      y:{
-        field:"market",
-        type:"nominal",
-        title:null
-      },
-      color:{
-        field:"ppm",
-        type:"quantitative",
-        title:"Median AED/m²",
-        scale:{scheme:"blues"}
-      },
-      stroke:{
-        condition:{
-          param:"bedroomSelection",
-          value:"#172554"
-        },
-        value:"white"
-      },
-      strokeWidth:{
-        condition:{
-          param:"bedroomSelection",
-          value:3
-        },
-        value:1.5
-      },
-      tooltip:[
-        {field:"rooms",title:"Bedrooms"},
-        {field:"market",title:"Registration"},
-        {field:"ppm",title:"Median AED/m²",format:",.0f"},
-        {field:"count",title:"Transactions",format:","}
-      ]
-    }
-  };
+ const result=await vegaEmbed("#heatmap",spec,{actions:false});
+ heatmapView=result.view;
 
-  const result = await vegaEmbed(
-    "#heatmap",spec,{actions:false}
-  );
+ heatmapView.addEventListener("click",async(event,item)=>{
+  if(!item?.datum?.rooms) return;
+  await chooseBedroom(item.datum.rooms);
+ });
 
-  heatmapView = result.view;
+ heatmapView.addEventListener("dblclick",async()=>{
+  await chooseBedroom(null);
+ });
+}
 
-  heatmapView.addEventListener("click",async (event,item)=>{
-    if (!item || !item.datum || !item.datum.rooms) return;
+async function chooseBedroom(bedroom) {
+ selectedBedroom=bedroom;
+ updateKPIs();
+ updateInsights();
+ updateTable();
 
-    selectedBedroom = item.datum.rooms;
-    await Promise.all([
-      drawScatter(filteredRows),
-      drawBars(filteredRows)
-    ]);
-    updateTable();
-  });
+ await Promise.all([
+  drawScatter(filteredRows),
+  drawBars(filteredRows)
+ ]);
+}
 
-  heatmapView.addEventListener("dblclick",async ()=>{
-    selectedBedroom = null;
-    await Promise.all([
-      drawScatter(filteredRows),
-      drawBars(filteredRows)
-    ]);
-    updateTable();
-  });
+function updateInsights() {
+ const rows=selectedRows();
+ const target=el("marketInsight");
+
+ if(!rows.length) {
+  target.textContent="No transactions match the current selection.";
+  return;
+ }
+
+ const summary=grouped(rows,["rooms"]);
+ const highest=[...summary].sort((a,b)=>b.ppm-a.ppm)[0];
+
+ const existing=rows.filter(d=>d.market==="Existing Properties");
+ const offplan=rows.filter(d=>d.market==="Off-Plan Properties");
+
+ const existingMedian=median(existing.map(d=>d.ppm));
+ const offplanMedian=median(offplan.map(d=>d.ppm));
+
+ let insight=
+  "The current selection contains "+fmt(rows.length)+
+  " apartment sales. ";
+
+ if(highest) {
+  insight+="Among bedroom groups with at least 10 sales, "+
+   highest.rooms+" has the highest median price per m² ("+
+   money(highest.ppm)+"/m²). ";
+ }
+
+ if(Number.isFinite(existingMedian) &&
+    Number.isFinite(offplanMedian)) {
+  const difference=Math.abs(offplanMedian-existingMedian);
+  const higher=offplanMedian>existingMedian
+   ? "Off-plan" : "Existing";
+
+  insight+=higher+
+   " transactions have a higher median price per m² by "+
+   money(difference)+
+   " in the current selection. ";
+ }
+
+ insight+="These differences may reflect location, size, "+
+  "development, and other factors; they do not prove causation.";
+
+ target.textContent=insight;
+}
+
+function updateQuality() {
+ el("qualityInsight").textContent=
+  "Source dataset: "+fmt(rawCount)+
+  " records. "+fmt(allRows.length)+
+  " residential flat sales pass the project filters; "+
+  fmt(excludedCount)+
+  " records do not pass one or more selection or quality rules. "+
+  "Rules include transaction type, date, size (20–500 m²), "+
+  "and value (AED 100,000–20 million). "+
+  "Excluded records are not all necessarily data errors: "+
+  "some are simply outside the study scope. "+
+  "The charts use transaction values, not current listing prices. "+
+  "Medians reduce sensitivity to extreme values. "+
+  "Heatmap and bedroom comparison groups require at least 10 sales.";
 }
 
 function updateTable() {
-  const query = document.getElementById("searchBox")
-    .value.toLowerCase().trim();
+ const query=el("searchBox").value.toLowerCase().trim();
 
-  const rows = filteredRows.filter(d=>
-    (selectedBedroom===null || d.rooms===selectedBedroom) &&
-    d.community.toLowerCase().includes(query)
-  );
+ const rows=selectedRows().filter(d=>
+  d.community.toLowerCase().includes(query)
+ );
 
-  const tbody = document.getElementById("detailsBody");
-  tbody.replaceChildren();
+ const tbody=el("detailsBody");
+ tbody.replaceChildren();
 
-  for (const d of rows.slice(0,100)) {
-    const tr = document.createElement("tr");
+ for(const d of rows.slice(0,100)) {
+  const tr=document.createElement("tr");
+  [
+   d.community,d.rooms,d.market,
+   d.size.toFixed(1),fmt(d.price),fmt(d.ppm)
+  ].forEach(value=>{
+   const td=document.createElement("td");
+   td.textContent=value;
+   tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+ }
 
-    [
-      d.community,
-      d.rooms,
-      d.market,
-      d.size.toFixed(1),
-      fmt(d.price),
-      fmt(d.ppm)
-    ].forEach(value=>{
-      const td = document.createElement("td");
-      td.textContent = value;
-      tr.appendChild(td);
-    });
-
-    tbody.appendChild(tr);
-  }
-
-  document.getElementById("tableNote").textContent =
-    "Showing " + Math.min(rows.length,100) +
-    " of " + fmt(rows.length) +
-    " matching transactions.";
+ el("tableNote").textContent=
+  "Showing "+Math.min(100,rows.length)+
+  " of "+fmt(rows.length)+" matching transactions.";
 }
 
 async function updateDashboard() {
-  const version = ++renderVersion;
+ const version=++dashboardVersion;
+ filteredRows=getRows();
+ selectedBedroom=null;
 
-  filteredRows = getRows();
-  selectedBedroom = null;
+ updateKPIs();
+ updateInsights();
+ updateTable();
 
-  updateKPIs(filteredRows);
-  updateTable();
+ try {
+  await Promise.all([
+   drawDonut(filteredRows),
+   drawBars(filteredRows),
+   drawScatter(filteredRows),
+   drawHeatmap(filteredRows)
+  ]);
+  if(version!==dashboardVersion) return;
+ } catch(error) {
+  console.error(error);
+  el("marketInsight").textContent=
+   "A chart failed to render: "+error.message;
+ }
+}
 
-  try {
-    await Promise.all([
-      drawDonut(filteredRows),
-      drawBars(filteredRows),
-      drawScatter(filteredRows),
-      drawHeatmap(filteredRows)
-    ]);
+function fillCommunities() {
+ const names=[...new Set(
+  allRows.map(d=>d.community)
+   .filter(n=>n!=="Unknown")
+ )].sort((a,b)=>a.localeCompare(b));
 
-    if (version!==renderVersion) return;
-  } catch(e) {
-    console.error(e);
-    alert("Chart loading error: "+e.message);
-  }
+ const select=el("communityFilter");
+ for(const name of names) {
+  const option=document.createElement("option");
+  option.value=name;
+  option.textContent=name;
+  select.appendChild(option);
+ }
 }
 
 async function loadData() {
-  try {
-    const loader = vega.loader();
-    const csvText = await loader.load(CSV_URL);
-    const raw = vega.read(csvText,{type:"csv"});
+ try {
+  const loader=vega.loader();
+  const csvText=await loader.load(CSV_URL);
+  const raw=vega.read(csvText,{type:"csv"});
 
-    allRows = raw.map(validRow).filter(Boolean);
+  rawCount=raw.length;
+  allRows=raw.map(prepareRow).filter(Boolean);
+  excludedCount=rawCount-allRows.length;
 
-    await updateDashboard();
-  } catch(e) {
-    console.error(e);
-    alert("Unable to load transaction CSV: "+e.message);
-  }
+  fillCommunities();
+  updateQuality();
+  await updateDashboard();
+ } catch(error) {
+  console.error(error);
+  el("marketInsight").textContent=
+   "Unable to load transaction data: "+error.message;
+ }
 }
 
-document.getElementById("marketFilter")
-  .addEventListener("change",updateDashboard);
+el("marketFilter").addEventListener("change",updateDashboard);
+el("bedroomFilter").addEventListener("change",updateDashboard);
+el("communityFilter").addEventListener("change",updateDashboard);
 
-document.getElementById("bedroomFilter")
-  .addEventListener("change",updateDashboard);
+el("resetFilters").addEventListener("click",()=>{
+ el("marketFilter").value="All";
+ el("bedroomFilter").value="All";
+ el("communityFilter").value="All";
+ el("searchBox").value="";
+ updateDashboard();
+});
 
-document.getElementById("resetBtn")
-  .addEventListener("click",()=>{
-    document.getElementById("marketFilter").value="All";
-    document.getElementById("bedroomFilter").value="All";
-    document.getElementById("searchBox").value="";
-    updateDashboard();
-  });
+el("sizeZoom").addEventListener("input",()=>{
+ drawScatter(filteredRows);
+});
+el("priceZoom").addEventListener("input",()=>{
+ drawScatter(filteredRows);
+});
+el("resetZoom").addEventListener("click",()=>{
+ el("sizeZoom").value="500";
+ el("priceZoom").value="20";
+ drawScatter(filteredRows);
+});
 
-document.getElementById("searchBox")
-  .addEventListener("input",updateTable);
+el("searchBox").addEventListener("input",updateTable);
 
 loadData();
 </script>
