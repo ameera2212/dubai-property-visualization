@@ -3,8 +3,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dubai Property DNA | Interactive Real Estate Analytics</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dubai Property DNA | Analytics Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
@@ -12,796 +12,476 @@
 
 <style>
 :root {
-  --navy: #16365f;
-  --blue: #2563eb;
+  --navy: #17365d;
+  --blue: #367ab8;
+  --orange: #f1a15b;
+  --background: #f4f6f9;
+  --border: #dce3eb;
   --muted: #64748b;
-  --line: #dce6f2;
-  --bg: #f3f7fc;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: Inter, Segoe UI, Arial, sans-serif;
-  color: var(--navy);
-  background: var(--bg);
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--background);
+  color: #24364b;
 }
 
-header {
-  background: white;
-  border-bottom: 1px solid var(--line);
-  padding: 19px clamp(18px, 3vw, 48px);
-}
-
-.header-inner {
-  max-width: 1560px;
-  margin: auto;
+.topbar {
+  height: 58px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 25px;
 }
 
-h1 {
-  margin: 0;
-  font-size: clamp(24px, 2.5vw, 34px);
-  letter-spacing: -0.6px;
+.brand {
+  font-size: 20px;
+  font-weight: 750;
+  color: var(--navy);
 }
 
-.subtitle {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.tag {
-  background: #eaf2ff;
-  color: #1e4f8d;
-  padding: 9px 13px;
-  border-radius: 30px;
+.top-label {
   font-size: 12px;
-  font-weight: 700;
+  color: var(--muted);
 }
 
 main {
-  max-width: 1560px;
-  margin: 18px auto;
-  padding: 0 clamp(14px, 2vw, 30px);
+  max-width: 1550px;
+  margin: auto;
+  padding: 18px;
 }
 
-.toolbar {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  padding: 14px 19px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  box-shadow: 0 5px 22px #16365f09;
-}
-
-.toolbar label {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.toolbar select {
-  background: #f8fbff;
-  border: 1px solid #bdcfe4;
-  border-radius: 9px;
-  padding: 10px 35px 10px 12px;
-  font-size: 14px;
-  color: var(--navy);
-  min-width: 215px;
-}
-
-.hint {
-  font-size: 12px;
-  color: var(--muted);
-  margin-left: auto;
-}
-
-.dashboard {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 17px;
-  padding: 19px 15px 8px;
-  margin-top: 16px;
-  box-shadow: 0 5px 22px #16365f0a;
-  overflow-x: auto;
-}
-
-.dashboard-header {
-  padding: 0 7px 13px;
+.page-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.page-title h1 {
+  font-size: 23px;
+  margin: 0;
+  color: var(--navy);
+}
+
+.page-title p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 5px 0 0;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-.dashboard-header h2 {
-  font-size: 17px;
-  margin: 0;
+select, input {
+  padding: 9px 12px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--navy);
 }
 
-.dashboard-header p {
+button {
+  border: 1px solid #b9cbe0;
+  background: white;
+  padding: 9px 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--navy);
+}
+
+button:hover { background: #eaf2fb; }
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.kpi {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 17px 20px;
+  min-width: 0;
+}
+
+.kpi-label {
   font-size: 12px;
   color: var(--muted);
-  margin: 0;
+  margin-bottom: 9px;
 }
 
-#vis {
-  min-height: 460px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+.kpi-value {
+  font-size: clamp(20px, 2.1vw, 31px);
+  font-weight: 650;
+  color: var(--blue);
 }
 
-.vega-embed {
-  max-width: 100%;
+.kpi-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 6px;
 }
 
-.vega-embed canvas {
-  max-width: none;
-}
-
-.notes {
+.dashboard {
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 16px;
-  margin: 16px 0 22px;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.note {
+.panel {
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 17px 20px;
+  border: 1px solid var(--border);
+  padding: 15px;
+  min-width: 0;
+  overflow: auto;
 }
 
-.note h3 {
-  margin: 0 0 8px;
-  font-size: 15px;
+.panel h2 {
+  font-size: 14px;
+  color: var(--navy);
+  margin: 0 0 5px;
 }
 
-.note p {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.65;
-  color: #53677e;
+.panel p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0 0 12px;
+  line-height: 1.5;
 }
 
-.status {
-  font-size: 13px;
-  color: #64748b;
+.chart {
+  min-height: 190px;
+}
+
+.lower {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.table-panel {
+  background: white;
+  border: 1px solid var(--border);
   padding: 15px;
 }
 
-footer {
-  text-align: center;
-  color: #718096;
-  font-size: 12px;
-  padding: 0 15px 20px;
+.table-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
 
-@media (max-width: 850px) {
-  .notes {
-    grid-template-columns: 1fr;
-  }
+.table-head h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 15px;
+}
 
-  .hint {
-    margin-left: 0;
-  }
+.table-wrap {
+  max-height: 270px;
+  overflow: auto;
+}
 
-  .dashboard {
-    padding: 14px 7px;
-  }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
 
-  .toolbar {
-    align-items: flex-start;
-  }
+th {
+  position: sticky;
+  top: 0;
+  background: #eaf0f7;
+  color: var(--navy);
+  text-align: left;
+  padding: 11px;
+  white-space: nowrap;
+}
+
+td {
+  border-bottom: 1px solid #edf1f5;
+  padding: 10px 11px;
+  white-space: nowrap;
+}
+
+tr:hover td { background: #f5f9ff; }
+
+.status {
+  padding: 30px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.footer {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  padding: 10px 0 25px;
+}
+
+@media(max-width: 950px) {
+  .kpis { grid-template-columns: repeat(2,1fr); }
+  .dashboard, .lower { grid-template-columns: 1fr; }
+}
+
+@media(max-width: 550px) {
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .topbar { padding: 0 12px; }
+  main { padding: 10px; }
+  .panel { padding: 10px; }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="header-inner">
-    <div>
-      <h1>Dubai Property DNA</h1>
-      <p class="subtitle">
-        What Makes a Property Valuable?
-        · Interactive Real Estate Analytics
-      </p>
-    </div>
-    <span class="tag">2023 – Aug 2026</span>
-  </div>
+<header class="topbar">
+  <div class="brand">Dubai Property DNA</div>
+  <div class="top-label">PROPERTY VALUES | ANALYSIS</div>
 </header>
 
 <main>
 
-  <div class="toolbar">
-    <label for="marketFilter">Property Market</label>
-
-    <select id="marketFilter">
-      <option value="All">All Properties</option>
-      <option value="Off-Plan Properties">
-        Off-Plan Properties
-      </option>
-      <option value="Existing Properties">
-        Existing Properties
-      </option>
-    </select>
-
-    <span class="hint">
-      Click a heatmap cell to highlight bedrooms across charts
-      · Double-click to clear
-      · Scroll over scatter to zoom
-    </span>
+<div class="page-title">
+  <div>
+    <h1>Dubai Residential Property Analytics</h1>
+    <p>Interactive apartment sales analysis | 2023–2026</p>
   </div>
 
-  <section class="dashboard">
-    <div class="dashboard-header">
-      <h2>Explore Dubai apartment sales</h2>
-      <p>
-        Size vs price · Median AED/m² · Bedroom comparison
-      </p>
-    </div>
+  <div class="filters">
+    <select id="marketFilter">
+      <option value="All">All Markets</option>
+      <option value="Off-Plan Properties">Off-Plan</option>
+      <option value="Existing Properties">Existing</option>
+    </select>
 
-    <div id="vis">
-      <div class="status">
-        Loading transaction data and visualizations…
-      </div>
-    </div>
-  </section>
+    <select id="bedroomFilter">
+      <option value="All">All Bedrooms</option>
+      <option value="Studio">Studio</option>
+      <option value="1 B/R">1 Bedroom</option>
+      <option value="2 B/R">2 Bedrooms</option>
+      <option value="3 B/R">3 Bedrooms</option>
+      <option value="4 B/R">4 Bedrooms</option>
+    </select>
 
-  <section class="notes">
+    <button id="resetBtn">Reset Filters</button>
+  </div>
+</div>
 
-    <div class="note">
-      <h3>How to Explore</h3>
-      <p>
-        Use the market dropdown to compare off-plan
-        and existing apartment sales.
+<section class="kpis">
+  <div class="kpi">
+    <div class="kpi-label">Total Apartment Sales</div>
+    <div class="kpi-value" id="kpiCount">—</div>
+    <div class="kpi-sub">Filtered transactions</div>
+  </div>
 
-        Hover over marks for details.
+  <div class="kpi">
+    <div class="kpi-label">Median Transaction Value</div>
+    <div class="kpi-value" id="kpiPrice">—</div>
+    <div class="kpi-sub">AED per transaction</div>
+  </div>
 
-        Click any bedroom category in the heatmap
-        to highlight matching sales in the scatter
-        plot and the corresponding comparison bar.
+  <div class="kpi">
+    <div class="kpi-label">Median Price per m²</div>
+    <div class="kpi-value" id="kpiMeter">—</div>
+    <div class="kpi-sub">AED / m²</div>
+  </div>
 
-        Double-click the heatmap to clear the selection.
+  <div class="kpi">
+    <div class="kpi-label">Communities Represented</div>
+    <div class="kpi-value" id="kpiAreas">—</div>
+    <div class="kpi-sub">Distinct named communities</div>
+  </div>
+</section>
 
-        Scroll and drag within the scatter plot
-        to zoom and pan.
-      </p>
-    </div>
+<section class="dashboard">
+  <div class="panel">
+    <h2>01 — Sales Distribution</h2>
+    <p>Share of transactions by registration type</p>
+    <div id="donut" class="chart"></div>
+  </div>
 
-    <div class="note">
-      <h3>Data & Interpretation</h3>
-      <p>
-        Residential flat sales dated January 2023
-        through August 2026, filtered to 20–500 m²
-        and AED 100,000–20 million.
+  <div class="panel">
+    <h2>02 — Property Value by Bedroom Category</h2>
+    <p>Median AED/m² and transaction counts</p>
+    <div id="bars" class="chart"></div>
+  </div>
+</section>
 
-        Prices per m² are calculated as transaction
-        value divided by area.
+<section class="lower">
+  <div class="panel">
+    <h2>03 — Property Value Explorer</h2>
+    <p>Apartment size vs transaction value · Scroll to zoom · Drag to pan</p>
+    <div id="scatter" class="chart"></div>
+  </div>
 
-        Heatmap and bar chart use medians.
+  <div class="panel">
+    <h2>04 — Property DNA Heatmap</h2>
+    <p>Click a cell to select a bedroom category · Double-click to clear</p>
+    <div id="heatmap" class="chart"></div>
+  </div>
+</section>
 
-        Heatmap groups with fewer than 10 sales
-        are excluded.
+<section class="table-panel">
+  <div class="table-head">
+    <h2>05 — Transaction Details</h2>
+    <input id="searchBox" placeholder="Search community...">
+  </div>
 
-        These are descriptive associations,
-        not causal explanations.
-      </p>
-    </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Community</th>
+          <th>Bedrooms</th>
+          <th>Registration</th>
+          <th>Size (m²)</th>
+          <th>Value (AED)</th>
+          <th>AED/m²</th>
+        </tr>
+      </thead>
+      <tbody id="detailsBody"></tbody>
+    </table>
+  </div>
+  <p id="tableNote" style="font-size:11px;color:#64748b"></p>
+</section>
 
-  </section>
+<div class="footer">
+  Data: Course transactions.csv. Residential flat sales from
+  January 2023 through August 2026, with transaction sizes
+  between 20 and 500 m² and values between AED 100,000
+  and AED 20 million. Median values describe transactions,
+  not the causes of price differences. Heatmap groups require
+  at least 10 transactions.
+</div>
 
 </main>
 
-<footer>
-  Dubai Property DNA · CS333 Interactive Visualization
-  · Source: Course transactions.csv
-</footer>
-
 <script>
+const CSV_URL =
+ "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv";
 
-const DATA_URL =
-  "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv";
+const order = ["Studio","1 B/R","2 B/R","3 B/R","4 B/R"];
 
-const bedrooms = [
-  "Studio",
-  "1 B/R",
-  "2 B/R",
-  "3 B/R",
-  "4 B/R"
-];
+const colors = {
+  "Existing Properties": "#367ab8",
+  "Off-Plan Properties": "#f1a15b"
+};
 
-const transforms = [
-  {
-    filter:
-      "datum.trans_group_en === 'Sales' && " +
-      "datum.property_type_en === 'Unit' && " +
-      "datum.property_sub_type_en === 'Flat' && " +
-      "datum.property_usage_en === 'Residential'"
-  },
-  {
-    calculate: "toDate(datum.instance_date)",
-    as: "sale_date"
-  },
-  {
-    filter:
-      "isValid(datum.sale_date) && " +
-      "datum.sale_date >= datetime(2023,0,1) && " +
-      "datum.sale_date < datetime(2026,8,1)"
-  },
-  {
-    calculate: "toNumber(datum.procedure_area)",
-    as: "size_m2"
-  },
-  {
-    calculate: "toNumber(datum.actual_worth)",
-    as: "price_aed"
-  },
-  {
-    filter:
-      "isValid(datum.size_m2) && " +
-      "isValid(datum.price_aed) && " +
-      "datum.size_m2 >= 20 && " +
-      "datum.size_m2 <= 500 && " +
-      "datum.price_aed >= 100000 && " +
-      "datum.price_aed <= 20000000"
-  },
-  {
-    calculate: "datum.price_aed / datum.size_m2",
-    as: "price_per_m2"
-  },
-  {
-    filter:
-      "propertyFilter === 'All' || " +
-      "datum.reg_type_en === propertyFilter"
-  }
-];
+let allRows = [];
+let filteredRows = [];
+let selectedBedroom = null;
+let scatterView = null;
+let heatmapView = null;
+let renderVersion = 0;
 
-const medianTransform = (groupby) => [
-  {
-    filter:
-      "isValid(datum.rooms_en) && " +
-      "indexof(['Studio','1 B/R','2 B/R','3 B/R','4 B/R'],datum.rooms_en) >= 0"
-  },
-  {
-    aggregate: [
-      {
-        op: "median",
-        field: "price_per_m2",
-        as: "median_price_m2"
-      },
-      {
-        op: "count",
-        as: "transaction_count"
-      }
-    ],
-    groupby
-  },
-  {
-    filter: "datum.transaction_count >= 10"
-  }
-];
+const fmt = n => Math.round(n).toLocaleString("en-US");
 
-function makeSpec(mobile) {
+function median(values) {
+  const a = values.filter(Number.isFinite).sort((x,y)=>x-y);
+  if (!a.length) return 0;
+  const m = Math.floor(a.length/2);
+  return a.length%2 ? a[m] : (a[m-1]+a[m])/2;
+}
 
-  const scatterWidth = mobile
-    ? Math.max(
-        300,
-        Math.min(window.innerWidth - 130, 640)
-      )
-    : Math.max(
-        450,
-        Math.min(
-          720,
-          Math.round((window.innerWidth - 180) * 0.54)
-        )
-      );
+function money(n) {
+  if (n >= 1000000) return "AED " + (n/1000000).toFixed(2) + "M";
+  if (n >= 1000) return "AED " + (n/1000).toFixed(1) + "K";
+  return "AED " + fmt(n);
+}
 
-  const rightWidth = mobile
-    ? scatterWidth
-    : Math.max(
-        345,
-        Math.min(
-          520,
-          Math.round((window.innerWidth - 180) * 0.35)
-        )
-      );
+function validRow(d) {
+  const date = new Date(d.instance_date);
+  const size = Number(d.procedure_area);
+  const price = Number(d.actual_worth);
 
-  // VISUALIZATION 1: SCATTER PLOT
+  if (
+    d.trans_group_en !== "Sales" ||
+    d.property_type_en !== "Unit" ||
+    d.property_sub_type_en !== "Flat" ||
+    d.property_usage_en !== "Residential"
+  ) return null;
 
-  const scatter = {
-    title: {
-      text: "01  Property Value Explorer",
-      subtitle: "Apartment size vs transaction price · Zoom and pan"
-    },
+  if (
+    !Number.isFinite(date.getTime()) ||
+    date < new Date(2023,0,1) ||
+    date >= new Date(2026,8,1)
+  ) return null;
 
-    width: scatterWidth,
-    height: mobile ? 280 : 445,
-
-    params: [
-      {
-        name: "propertyZoom",
-        select: {
-          type: "interval",
-          encodings: ["x", "y"],
-          bind: "scales",
-          translate:
-            "[mousedown, window:mouseup] > window:mousemove!",
-          zoom: "wheel!"
-        }
-      }
-    ],
-
-    mark: {
-      type: "circle",
-      size: 23,
-      stroke: "white",
-      strokeWidth: 0.25
-    },
-
-    encoding: {
-      x: {
-        field: "size_m2",
-        type: "quantitative",
-        title: "Apartment size (m²)"
-      },
-
-      y: {
-        field: "price_aed",
-        type: "quantitative",
-        title: "Transaction price (AED)",
-        axis: {
-          format: "~s"
-        }
-      },
-
-      color: {
-        condition: {
-          param: "bedroomSelection",
-          field: "reg_type_en",
-          type: "nominal",
-          scale: {
-            domain: [
-              "Existing Properties",
-              "Off-Plan Properties"
-            ],
-            range: [
-              "#367ab8",
-              "#ef9d59"
-            ]
-          }
-        },
-        value: "#cbd5e1",
-        title: "Registration type"
-      },
-
-      opacity: {
-        condition: {
-          param: "bedroomSelection",
-          value: 0.65
-        },
-        value: 0.09
-      },
-
-      tooltip: [
-        {
-          field: "area_name_en",
-          title: "Community"
-        },
-        {
-          field: "rooms_en",
-          title: "Bedrooms"
-        },
-        {
-          field: "size_m2",
-          title: "Size (m²)",
-          format: ",.1f"
-        },
-        {
-          field: "price_aed",
-          title: "Price (AED)",
-          format: ",.0f"
-        },
-        {
-          field: "price_per_m2",
-          title: "AED/m²",
-          format: ",.0f"
-        },
-        {
-          field: "reg_type_en",
-          title: "Registration"
-        }
-      ]
-    }
-  };
-
-  // VISUALIZATION 2: HEATMAP
-
-  const heatmap = {
-    title: {
-      text: "02  Property DNA Heatmap",
-      subtitle: "Click a cell to select a bedroom category"
-    },
-
-    width: rightWidth,
-    height: mobile ? 150 : 172,
-
-    transform: medianTransform([
-      "rooms_en",
-      "reg_type_en"
-    ]),
-
-    params: [
-      {
-        name: "bedroomSelection",
-        select: {
-          type: "point",
-          fields: ["rooms_en"],
-          on: "click",
-          clear: "dblclick"
-        }
-      }
-    ],
-
-    mark: {
-      type: "rect"
-    },
-
-    encoding: {
-      x: {
-        field: "rooms_en",
-        type: "nominal",
-        title: "Bedroom category",
-        sort: bedrooms,
-        axis: {
-          labelAngle: 0
-        }
-      },
-
-      y: {
-        field: "reg_type_en",
-        type: "nominal",
-        title: null
-      },
-
-      color: {
-        field: "median_price_m2",
-        type: "quantitative",
-        title: "Median AED/m²",
-        scale: {
-          scheme: "blues"
-        }
-      },
-
-      stroke: {
-        condition: {
-          param: "bedroomSelection",
-          value: "#172554"
-        },
-        value: "white"
-      },
-
-      strokeWidth: {
-        condition: {
-          param: "bedroomSelection",
-          value: 3
-        },
-        value: 1.5
-      },
-
-      tooltip: [
-        {
-          field: "rooms_en",
-          title: "Bedrooms"
-        },
-        {
-          field: "reg_type_en",
-          title: "Registration"
-        },
-        {
-          field: "median_price_m2",
-          title: "Median AED/m²",
-          format: ",.0f"
-        },
-        {
-          field: "transaction_count",
-          title: "Sales",
-          format: ","
-        }
-      ]
-    }
-  };
-
-  // VISUALIZATION 3: COMPARISON
-
-  const comparison = {
-    title: {
-      text: "03  Smart Property Comparison",
-      subtitle: "Median AED/m² across bedroom categories"
-    },
-
-    width: rightWidth,
-    height: mobile ? 170 : 195,
-
-    transform: medianTransform(["rooms_en"]),
-
-    encoding: {
-      y: {
-        field: "rooms_en",
-        type: "nominal",
-        title: null,
-        sort: bedrooms
-      },
-
-      x: {
-        field: "median_price_m2",
-        type: "quantitative",
-        title: "Median AED/m²",
-        scale: {
-          zero: true,
-          nice: true
-        },
-        axis: {
-          format: "~s"
-        }
-      }
-    },
-
-    layer: [
-      {
-        mark: {
-          type: "bar",
-          cornerRadiusEnd: 4
-        },
-
-        encoding: {
-          color: {
-            condition: {
-              param: "bedroomSelection",
-              value: "#1d4ed8"
-            },
-            value: "#a9cdeb"
-          },
-
-          opacity: {
-            condition: {
-              param: "bedroomSelection",
-              value: 1
-            },
-            value: 0.7
-          },
-
-          tooltip: [
-            {
-              field: "rooms_en",
-              title: "Bedrooms"
-            },
-            {
-              field: "median_price_m2",
-              title: "Median AED/m²",
-              format: ",.0f"
-            },
-            {
-              field: "transaction_count",
-              title: "Sales",
-              format: ","
-            }
-          ]
-        }
-      },
-
-      {
-        mark: {
-          type: "text",
-          align: "left",
-          baseline: "middle",
-          dx: 5,
-          fontSize: 11,
-          fontWeight: "bold",
-          color: "#16365f"
-        },
-
-        encoding: {
-          text: {
-            field: "median_price_m2",
-            type: "quantitative",
-            format: ",.0f"
-          }
-        }
-      }
-    ]
-  };
-
-  // HORIZONTAL DASHBOARD LAYOUT
+  if (
+    !Number.isFinite(size) ||
+    !Number.isFinite(price) ||
+    size < 20 || size > 500 ||
+    price < 100000 || price > 20000000
+  ) return null;
 
   return {
-    $schema:
-      "https://vega.github.io/schema/vega-lite/v6.json",
+    community: d.area_name_en || "Unknown",
+    rooms: d.rooms_en || "Unknown",
+    market: d.reg_type_en || "Unknown",
+    size,
+    price,
+    ppm: price/size
+  };
+}
 
+function getRows() {
+  const market = document.getElementById("marketFilter").value;
+  const bedroom = document.getElementById("bedroomFilter").value;
+
+  return allRows.filter(d =>
+    (market === "All" || d.market === market) &&
+    (bedroom === "All" || d.rooms === bedroom)
+  );
+}
+
+function updateKPIs(rows) {
+  document.getElementById("kpiCount").textContent = fmt(rows.length);
+
+  document.getElementById("kpiPrice").textContent =
+    rows.length ? money(median(rows.map(d=>d.price))) : "—";
+
+  document.getElementById("kpiMeter").textContent =
+    rows.length ? "AED " + fmt(median(rows.map(d=>d.ppm))) : "—";
+
+  document.getElementById("kpiAreas").textContent =
+    fmt(new Set(rows.filter(d=>d.community!=="Unknown")
+      .map(d=>d.community)).size);
+}
+
+function chartBase(values) {
+  return {
+    $schema: "https://vega.github.io/schema/vega-lite/v6.json",
     background: "white",
-
-    data: {
-      url: DATA_URL,
-      format: {
-        type: "csv"
-      }
-    },
-
-    params: [
-      {
-        name: "propertyFilter",
-        value:
-          document.getElementById("marketFilter").value
-      }
-    ],
-
-    transform: transforms,
-
-    ...(mobile
-      ? {
-          vconcat: [
-            scatter,
-            heatmap,
-            comparison
-          ]
-        }
-      : {
-          hconcat: [
-            scatter,
-            {
-              vconcat: [
-                heatmap,
-                comparison
-              ],
-              spacing: 28
-            }
-          ]
-        }
-    ),
-
-    spacing: 25,
-
-    resolve: {
-      scale: {
-        color: "independent"
-      }
-    },
-
+    data: {values},
     config: {
-      view: {
-        stroke: null
-      },
-
+      view: {stroke: null},
       axis: {
-        labelFontSize: 11,
-        titleFontSize: 12,
-        labelColor: "#41556d",
-        titleColor: "#16365f",
-        gridColor: "#e7edf5"
+        labelColor: "#475569",
+        titleColor: "#17365d",
+        gridColor: "#e8edf3",
+        labelFontSize: 10,
+        titleFontSize: 11
       },
-
-      title: {
-        anchor: "start",
-        fontSize: 15,
-        color: "#16365f",
-        subtitleFontSize: 11,
-        subtitleColor: "#718096"
-      },
-
       legend: {
         labelFontSize: 10,
         titleFontSize: 11
@@ -810,79 +490,386 @@ function makeSpec(mobile) {
   };
 }
 
-// RENDER DASHBOARD
+function grouped(rows, keys) {
+  const groups = new Map();
 
-let view = null;
-let renderToken = 0;
+  for (const d of rows) {
+    if (!order.includes(d.rooms)) continue;
 
-async function render() {
-  const token = ++renderToken;
-  const mobile = window.innerWidth < 850;
+    const key = keys.map(k=>d[k]).join("||");
 
-  try {
-    const result = await vegaEmbed(
-      "#vis",
-      makeSpec(mobile),
-      {
-        actions: false,
-        renderer: "canvas"
-      }
-    );
-
-    if (token !== renderToken) {
-      result.view.finalize();
-      return;
+    if (!groups.has(key)) {
+      groups.set(key, {items:[], sample:d});
     }
 
-    view = result.view;
+    groups.get(key).items.push(d.ppm);
+  }
 
-  } catch (error) {
-    console.error(error);
+  return [...groups.values()].map(g=>({
+    rooms: g.sample.rooms,
+    market: g.sample.market,
+    ppm: median(g.items),
+    count: g.items.length
+  })).filter(d=>d.count>=10);
+}
 
-    document.getElementById("vis").innerHTML =
-      '<div class="status">' +
-      "Unable to load dashboard. " +
-      "Please refresh and check the browser console. " +
-      String(error.message || error) +
-      "</div>";
+async function drawDonut(rows) {
+  const values = Object.keys(colors).map(market=>({
+    market,
+    count: rows.filter(d=>d.market===market).length
+  })).filter(d=>d.count>0);
+
+  const spec = {
+    ...chartBase(values),
+    width: 260,
+    height: 220,
+    mark: {
+      type: "arc",
+      innerRadius: 65,
+      outerRadius: 98
+    },
+    encoding: {
+      theta: {
+        field: "count",
+        type: "quantitative"
+      },
+      color: {
+        field: "market",
+        type: "nominal",
+        title: null,
+        scale: {
+          domain: Object.keys(colors),
+          range: Object.values(colors)
+        }
+      },
+      tooltip: [
+        {field:"market",title:"Registration"},
+        {field:"count",title:"Transactions",format:","}
+      ]
+    }
+  };
+
+  await vegaEmbed("#donut",spec,{actions:false});
+}
+
+async function drawBars(rows) {
+  const values = grouped(rows,["rooms"]);
+
+  const spec = {
+    ...chartBase(values),
+    width: 490,
+    height: 225,
+    encoding: {
+      x: {
+        field: "rooms",
+        type: "nominal",
+        sort: order,
+        title: "Bedroom category",
+        axis: {labelAngle:0}
+      },
+      y: {
+        field: "ppm",
+        type: "quantitative",
+        title: "Median AED/m²"
+      }
+    },
+    layer: [
+      {
+        mark: {
+          type:"bar",
+          cornerRadiusTopLeft:3,
+          cornerRadiusTopRight:3
+        },
+        encoding: {
+          color: {
+            condition: {
+              test: selectedBedroom
+                ? "datum.rooms === " + JSON.stringify(selectedBedroom)
+                : "false",
+              value: "#1d4ed8"
+            },
+            value:"#73add9"
+          },
+          tooltip: [
+            {field:"rooms",title:"Bedrooms"},
+            {field:"ppm",title:"Median AED/m²",format:",.0f"},
+            {field:"count",title:"Transactions",format:","}
+          ]
+        }
+      },
+      {
+        mark: {
+          type:"text",
+          dy:-8,
+          fontSize:10,
+          color:"#17365d"
+        },
+        encoding: {
+          text: {
+            field:"ppm",
+            type:"quantitative",
+            format:",.0f"
+          }
+        }
+      }
+    ]
+  };
+
+  await vegaEmbed("#bars",spec,{actions:false});
+}
+
+async function drawScatter(rows) {
+  const values = rows.map(d=>({
+    ...d,
+    selected: selectedBedroom===null ||
+      d.rooms===selectedBedroom
+  }));
+
+  const spec = {
+    ...chartBase(values),
+    width: 510,
+    height: 290,
+    params: [{
+      name:"zoomScatter",
+      select:{
+        type:"interval",
+        encodings:["x","y"],
+        bind:"scales",
+        translate:"[mousedown, window:mouseup] > window:mousemove!",
+        zoom:"wheel!"
+      }
+    }],
+    mark:{
+      type:"circle",
+      size:20,
+      stroke:"white",
+      strokeWidth:0.25
+    },
+    encoding:{
+      x:{
+        field:"size",
+        type:"quantitative",
+        title:"Apartment size (m²)"
+      },
+      y:{
+        field:"price",
+        type:"quantitative",
+        title:"Transaction value (AED)",
+        axis:{format:"~s"}
+      },
+      color:{
+        field:"market",
+        type:"nominal",
+        title:"Registration",
+        scale:{
+          domain:Object.keys(colors),
+          range:Object.values(colors)
+        }
+      },
+      opacity:{
+        condition:{
+          test:"datum.selected",
+          value:0.6
+        },
+        value:0.06
+      },
+      tooltip:[
+        {field:"community",title:"Community"},
+        {field:"rooms",title:"Bedrooms"},
+        {field:"market",title:"Registration"},
+        {field:"size",title:"Size (m²)",format:",.1f"},
+        {field:"price",title:"Price (AED)",format:",.0f"},
+        {field:"ppm",title:"AED/m²",format:",.0f"}
+      ]
+    }
+  };
+
+  const result = await vegaEmbed(
+    "#scatter",spec,{actions:false,renderer:"canvas"}
+  );
+  scatterView = result.view;
+}
+
+async function drawHeatmap(rows) {
+  const values = grouped(rows,["rooms","market"]);
+
+  const spec = {
+    ...chartBase(values),
+    width: 390,
+    height: 245,
+    params:[{
+      name:"bedroomSelection",
+      select:{
+        type:"point",
+        fields:["rooms"],
+        on:"click",
+        clear:"dblclick"
+      }
+    }],
+    mark:{type:"rect"},
+    encoding:{
+      x:{
+        field:"rooms",
+        type:"nominal",
+        sort:order,
+        title:"Bedroom category",
+        axis:{labelAngle:0}
+      },
+      y:{
+        field:"market",
+        type:"nominal",
+        title:null
+      },
+      color:{
+        field:"ppm",
+        type:"quantitative",
+        title:"Median AED/m²",
+        scale:{scheme:"blues"}
+      },
+      stroke:{
+        condition:{
+          param:"bedroomSelection",
+          value:"#172554"
+        },
+        value:"white"
+      },
+      strokeWidth:{
+        condition:{
+          param:"bedroomSelection",
+          value:3
+        },
+        value:1.5
+      },
+      tooltip:[
+        {field:"rooms",title:"Bedrooms"},
+        {field:"market",title:"Registration"},
+        {field:"ppm",title:"Median AED/m²",format:",.0f"},
+        {field:"count",title:"Transactions",format:","}
+      ]
+    }
+  };
+
+  const result = await vegaEmbed(
+    "#heatmap",spec,{actions:false}
+  );
+
+  heatmapView = result.view;
+
+  heatmapView.addEventListener("click",async (event,item)=>{
+    if (!item || !item.datum || !item.datum.rooms) return;
+
+    selectedBedroom = item.datum.rooms;
+    await Promise.all([
+      drawScatter(filteredRows),
+      drawBars(filteredRows)
+    ]);
+    updateTable();
+  });
+
+  heatmapView.addEventListener("dblclick",async ()=>{
+    selectedBedroom = null;
+    await Promise.all([
+      drawScatter(filteredRows),
+      drawBars(filteredRows)
+    ]);
+    updateTable();
+  });
+}
+
+function updateTable() {
+  const query = document.getElementById("searchBox")
+    .value.toLowerCase().trim();
+
+  const rows = filteredRows.filter(d=>
+    (selectedBedroom===null || d.rooms===selectedBedroom) &&
+    d.community.toLowerCase().includes(query)
+  );
+
+  const tbody = document.getElementById("detailsBody");
+  tbody.replaceChildren();
+
+  for (const d of rows.slice(0,100)) {
+    const tr = document.createElement("tr");
+
+    [
+      d.community,
+      d.rooms,
+      d.market,
+      d.size.toFixed(1),
+      fmt(d.price),
+      fmt(d.ppm)
+    ].forEach(value=>{
+      const td = document.createElement("td");
+      td.textContent = value;
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById("tableNote").textContent =
+    "Showing " + Math.min(rows.length,100) +
+    " of " + fmt(rows.length) +
+    " matching transactions.";
+}
+
+async function updateDashboard() {
+  const version = ++renderVersion;
+
+  filteredRows = getRows();
+  selectedBedroom = null;
+
+  updateKPIs(filteredRows);
+  updateTable();
+
+  try {
+    await Promise.all([
+      drawDonut(filteredRows),
+      drawBars(filteredRows),
+      drawScatter(filteredRows),
+      drawHeatmap(filteredRows)
+    ]);
+
+    if (version!==renderVersion) return;
+  } catch(e) {
+    console.error(e);
+    alert("Chart loading error: "+e.message);
   }
 }
 
-// PROPERTY MARKET FILTER
+async function loadData() {
+  try {
+    const loader = vega.loader();
+    const csvText = await loader.load(CSV_URL);
+    const raw = vega.read(csvText,{type:"csv"});
+
+    allRows = raw.map(validRow).filter(Boolean);
+
+    await updateDashboard();
+  } catch(e) {
+    console.error(e);
+    alert("Unable to load transaction CSV: "+e.message);
+  }
+}
 
 document.getElementById("marketFilter")
-  .addEventListener("change", async (e) => {
+  .addEventListener("change",updateDashboard);
 
-    if (!view) {
-      await render();
-      return;
-    }
+document.getElementById("bedroomFilter")
+  .addEventListener("change",updateDashboard);
 
-    try {
-      await view
-        .signal("propertyFilter", e.target.value)
-        .runAsync();
-
-    } catch (error) {
-      console.error(error);
-      await render();
-    }
+document.getElementById("resetBtn")
+  .addEventListener("click",()=>{
+    document.getElementById("marketFilter").value="All";
+    document.getElementById("bedroomFilter").value="All";
+    document.getElementById("searchBox").value="";
+    updateDashboard();
   });
 
-// RESPONSIVE RESIZING
+document.getElementById("searchBox")
+  .addEventListener("input",updateTable);
 
-let resizeTimer;
-
-window.addEventListener("resize", () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(render, 350);
-});
-
-// START
-
-render();
-
+loadData();
 </script>
-
 </body>
 </html>
